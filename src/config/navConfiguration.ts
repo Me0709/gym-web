@@ -1,10 +1,11 @@
-import { Home, Settings, LogOut, Building2, Trash2 } from "lucide-react"
+import { Home, Settings, LogOut, Building2, Trash2, User2 } from "lucide-react"
 import { type AppRole } from "@/features/auth/types/auth.types"
 
 export const MENU_ITEMS = {
   DASHBOARD: { label: "Dashboard", path: "/dashboard", icon: Home },
   GYMS: { label: "Gimnasios", path:"/gyms", icon: Building2 },
   REMOVED_GYMS: { label: "Gimnasios eliminados", path: "/removed-gyms", icon: Trash2 },
+  USERS: { label: "Usuarios", path: "/users", icon: User2 },
   SETTINGS: { label: "Configuración", path: "/settings", icon: Settings },
   LOGOUT: { label: "Cerrar Sesión", path: "/logout", icon: LogOut },
 }
@@ -27,6 +28,10 @@ export const ROLE_NAVIGATION: Partial<Record<AppRole, NavGroup[]>> = {
     {
       label: "Gestión de gimnasios",
       items: ["GYMS", "REMOVED_GYMS"],
+    },
+    {
+      label: "Gestion de usuarios",
+      items: ["USERS"],
     },
     {
       label: "Cuenta",

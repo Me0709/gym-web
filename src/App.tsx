@@ -8,6 +8,7 @@ import { ProtectedRoute } from "@/components/routing/ProtectedRoute";
 import GymsPage from "@/features/gyms/manage-gyms/pages/GymsPage";
 import UnauthorizedPage from "@/pages/UnauthorizedPage";
 import NotFoundPage from "@/pages/NotFoundPage";
+import { UsersPage } from "./features/users/manage-users/pages/UsersPage";
 
 function App() {
 
@@ -22,6 +23,7 @@ function App() {
         <Route element={<MainLayout />}>
           <Route element={<ProtectedRoute allowedRoles={['superadmin']} />}>
             <Route path="/gyms" element={<GymsPage />} />
+            <Route path="/users" element={<UsersPage />} />
           </Route>
 
           <Route element={<ProtectedRoute allowedRoles={['admin']} />}>

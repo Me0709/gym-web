@@ -58,7 +58,7 @@ export function GymTable({ gyms, onEdit, onDelete, isLoading }: GymTableProps) {
             <TableRow key={gym.id}>
               <TableCell className="font-medium">{gym.name}</TableCell>
               <TableCell>
-                <div className="max-w-[300px] truncate" title={gym.address}>
+                <div className="max-w-75 truncate" title={gym.address}>
                   {gym.address}
                 </div>
               </TableCell>

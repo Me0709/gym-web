@@ -6,7 +6,7 @@ import { useLoginForm } from "../hooks/useLoginForm"
 
 export function LoginForm() {
 
-  const { form, isPending, formError, onSubmit} = useLoginForm();
+  const { form, onSubmit} = useLoginForm();
 
   return (
     <Card className="w-full max-w-md">

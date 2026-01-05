@@ -3,7 +3,7 @@ import { Route, Routes, Navigate } from 'react-router-dom'
 import { MainLayout } from "@/components/layout/MainLayout";
 import { DashboardPage } from "@/features/dashboard/pages/DashboardPage";
 
-import { ProtectedRoute } from "@/common/components/routing/ProtectedRoute";
+import { ProtectedRoute } from "@/components/routing/ProtectedRoute";
 
 import GymsPage from "@/features/gyms/manage-gyms/pages/GymsPage";
 import UnauthorizedPage from "@/pages/UnauthorizedPage";
@@ -18,16 +18,16 @@ function App() {
       
       <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
-      <Route element={<ProtectedRoute allowedRoles={['superadmin']} />}>
-        <Route path="/gyms" element={<GymsPage />} />
-      </Route>
+      <Route element={<ProtectedRoute />}>
+        <Route element={<MainLayout />}>
+          <Route element={<ProtectedRoute allowedRoles={['superadmin']} />}>
+            <Route path="/gyms" element={<GymsPage />} />
+          </Route>
 
-      <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
-        <Route path="/dashboard" element={
-          <MainLayout title="Panel de Control">
-            <DashboardPage />
-          </MainLayout>
-        } />
+          <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
+            <Route path="/dashboard" element={<DashboardPage />} />
+          </Route>
+        </Route>
       </Route>
 
       <Route path="*" element={<NotFoundPage />} />

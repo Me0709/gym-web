@@ -1,6 +1,3 @@
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -18,8 +15,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { gymSchema, type GymFormValues } from "../../schemas/gyms.schemas";
+import { type GymFormValues } from "../../schemas/gyms.schemas";
 import { type Gym, GYM_STATUS } from "../../types/gyms.types";
+import { useGymForm } from "../hooks/useGymForm";
 
 interface GymFormProps {
   onSubmit: (data: GymFormValues) => void;
@@ -29,34 +27,11 @@ interface GymFormProps {
 }
 
 export function GymForm({ onSubmit, initialData, isLoading, onCancel }: GymFormProps) {
-  const form = useForm<GymFormValues>({
-    resolver: zodResolver(gymSchema),
-    defaultValues: {
-      name: "",
-      address: "",
-      status: GYM_STATUS.ACTIVE,
-    },
-  });
-
-  useEffect(() => {
-    if (initialData) {
-      form.reset({
-        name: initialData.name,
-        address: initialData.address,
-        status: initialData.status,
-      });
-    } else {
-      form.reset({
-        name: "",
-        address: "",
-        status: GYM_STATUS.ACTIVE,
-      });
-    }
-  }, [initialData, form]);
+  const { form, handleSubmit } = useGymForm({ initialData, onSubmit });
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pt-4">
+      <form onSubmit={handleSubmit} className="space-y-4 pt-4">
         <FormField
           control={form.control}
           name="name"

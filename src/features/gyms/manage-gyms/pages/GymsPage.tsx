@@ -2,12 +2,12 @@ import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GymTable } from "../components/GymTable";
 import { GymDialog } from "../components/GymDialog";
-import { useGyms } from "../hooks/useGyms";
+import { useGymsWithOwner } from "../hooks/useGymsWithOwner";
 import { useGymActions } from "../hooks/useGymActions";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 
 export default function GymsPage() {
-  const { gyms, isLoading: isGymsLoading } = useGyms();
+  const { gyms, isLoading: isGymsLoading } = useGymsWithOwner();
   const {
     isDialogOpen,
     setIsDialogOpen,
@@ -20,6 +20,7 @@ export default function GymsPage() {
     confirmDelete,
     handleSubmit,
     isLoading: isActionLoading,
+    apiError,
   } = useGymActions();
 
   return (
@@ -49,15 +50,16 @@ export default function GymsPage() {
         onSubmit={handleSubmit}
         initialData={selectedGym}
         isLoading={isActionLoading}
+        apiError={apiError}
       />
 
       <ConfirmDialog
         isOpen={isConfirmOpen}
         onOpenChange={setIsConfirmOpen}
         onConfirm={confirmDelete}
-        title="Eliminar Gimnasio"
-        description="¿Estás seguro de que deseas eliminar este gimnasio? Esta acción no se puede deshacer."
-        confirmText="Eliminar"
+        title="Desactivar Gimnasio"
+        description="Este gimnasio se moverá a la lista de inactivos. Podrás reactivarlo en cualquier momento en esa misma lista."
+        confirmText="Desactivar"
         variant="destructive"
       />
     </div>

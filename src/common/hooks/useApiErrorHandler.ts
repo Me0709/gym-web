@@ -24,13 +24,13 @@ export const useApiErrorHandler = <TFormValues extends FieldValues>(): UseApiErr
                 form.setError(fieldNameForForm as Path<TFormValues>, {
                     type: 'manual',
                     message: serverError.details && serverError.details.length > 0
-                        ? serverError.details.join('\n')
+                        ? serverError.details.join('. ')
                         : serverError.message,
                 });
             } else {
                 let generalErrorMessage = serverError.message;
                 if (serverError.details && serverError.details.length > 0) {
-                    generalErrorMessage += "\n" + serverError.details.join('\n');
+                    generalErrorMessage = serverError.details.join('\n');
                 }
                 setApiError(generalErrorMessage);
             }

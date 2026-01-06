@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import type { UseFormReturn, FieldValues, Path } from "react-hook-form";
 import type { ZodObject, ZodRawShape } from "zod";
 
@@ -33,6 +33,10 @@ export const useMultiStepForm = <TFormValues extends FieldValues, TStepProps ext
     const currentStepFieldsToValidate = useMemo(() => {
         return steps[currentStepIndex].fieldsToValidate || Object.keys(currentStepSchema.shape) as Path<TFormValues>[];
     }, [currentStepIndex, steps, currentStepSchema]);
+
+    useEffect(() => {
+        form.clearErrors();
+    }, [currentStepIndex, form]);
 
     const validateCurrentStep = async (): Promise<boolean> => {
         const isValid = await form.trigger(currentStepFieldsToValidate, { shouldFocus: true });

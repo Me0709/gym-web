@@ -3,7 +3,11 @@ import {
   type UseFormReturn,
   type FieldValues,
 } from "react-hook-form";
-import { Loader2, ArrowLeft, ArrowRight } from "lucide-react";
+import {
+  Card,
+  CardContent,
+} from "@/components/ui/card";
+import { Loader2, ArrowLeft, ArrowRight, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Form } from "@/components/ui/form";
 import { Button } from "./ui/button";
@@ -15,7 +19,7 @@ interface MultiStepFormContainerProps<
 > {
   form: UseFormReturn<TFormValues>;
   steps: FormStep<TFormValues, TStepProps>[];
-  onSubmit: (event?: React.BaseSyntheticEvent) => Promise<void>;
+  onSubmit: (event?: React.BaseSyntheticEvent) => Promise<boolean>;
   apiError: string | null;
   isPending: boolean;
   stepProps: TStepProps;
@@ -49,10 +53,17 @@ export function MultiStepFormContainer<
   } = useMultiStepForm<TFormValues, TStepProps>(form, steps);
 
   const finalHandleSubmit = async (e: React.BaseSyntheticEvent) => {
-    const isValid = await handleNextStep();
-    if (isValid) {
-      await onSubmit(e);
-      handleResetFormSteps();
+    e.preventDefault();
+    if (isLastStep) {
+      const isValid = await handleNextStep();
+      if (isValid) {
+        const success = await onSubmit(e);
+        if (success) {
+          handleResetFormSteps();
+        }
+      }
+    } else {
+      await handleNextStep();
     }
   };
 
@@ -60,66 +71,98 @@ export function MultiStepFormContainer<
     <Form {...form}>
       <form onSubmit={finalHandleSubmit} className="space-y-6">
         {apiError && (
-          <div className="p-4 bg-red-100 text-red-700 rounded-md text-sm text-center">
-            {apiError}
+          <div className="flex items-start gap-2 p-3 text-sm font-medium border rounded-lg border-destructive/50 bg-destructive/10 text-destructive">
+            <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+            <p className="whitespace-pre-line">{apiError}</p>
           </div>
         )}
-        <div className="flex justify-center space-x-2 mb-6">
+
+        <div className="flex items-center justify-center gap-2">
           {formSteps.map((step, index) => (
-            <span
-              key={step.id}
-              className={cn(
-                "px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200",
-                currentStepIndex === index
-                  ? "bg-blue-600 text-white shadow-md"
-                  : "bg-gray-200 text-gray-700 hover:bg-gray-300 cursor-pointer"
+            <React.Fragment key={step.id}>
+              <div 
+                className="flex items-center gap-2 cursor-pointer group"
+                onClick={() => handleGoToStep(index)}
+              >
+                <div
+                  className={cn(
+                    "flex h-7 w-7 items-center justify-center rounded-full border text-xs font-bold transition-all",
+                    currentStepIndex === index
+                      ? "bg-primary text-primary-foreground border-primary shadow-sm scale-110"
+                      : "bg-background text-muted-foreground border-input group-hover:border-primary/50"
+                  )}
+                >
+                  {index + 1}
+                </div>
+                <span className={cn(
+                  "hidden text-sm font-medium md:inline-block transition-colors",
+                  currentStepIndex === index ? "text-foreground" : "text-muted-foreground group-hover:text-foreground/80"
+                )}>
+                  {step.name}
+                </span>
+              </div>
+              {index < formSteps.length - 1 && (
+                <div className="h-0.5 w-8 bg-muted md:w-12 mx-1" />
               )}
-              onClick={() => handleGoToStep(index)}
-            >
-              {index + 1}. {step.name}
-            </span>
+            </React.Fragment>
           ))}
         </div>
 
-        <div className="bg-gray-50 p-6 rounded-xl border border-gray-200 shadow-inner">
-          <CurrentStepComponent {...stepProps} />
-        </div>
+        <Card className="border-none shadow-none bg-slate-50/50 dark:bg-slate-900/50">
+          <CardContent className="pt-2">
+            <CurrentStepComponent {...stepProps} />
+          </CardContent>
+        </Card>
 
-        <div className="flex justify-between mt-6">
-          {!isFirstStep && (
+        <div className="flex items-center justify-between gap-4 pt-2">
+          {!isFirstStep ? (
             <Button
               type="button"
               variant="outline"
-              onClick={handlePreviousStep}
+              onClick={(e) => {
+                e.preventDefault();
+                handlePreviousStep();
+              }}
               disabled={isPending}
               className="gap-2"
             >
               <ArrowLeft className="h-4 w-4" />
               Anterior
             </Button>
+          ) : (
+            <div />
           )}
 
-          {!isLastStep && (
-            <Button
-              type="button"
-              onClick={handleNextStep}
-              className="ml-auto gap-2"
-            >
-              <ArrowRight className="h-4 w-4" />
-              Siguiente
-            </Button>
-          )}
-
-          {isLastStep && (
-            <Button
-              type="submit"
-              disabled={isPending}
-              className="ml-auto gap-2"
-            >
-              {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isPending ? submittingButtonText : submitButtonText}
-            </Button>
-          )}
+          <div className="flex gap-3">
+            {!isLastStep ? (
+              <Button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNextStep();
+                }}
+                className="gap-2"
+              >
+                Siguiente
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            ) : (
+              <Button
+                type="submit"
+                disabled={isPending}
+                className="gap-2 min-w-30"
+              >
+                {isPending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    {submittingButtonText}
+                  </>
+                ) : (
+                  submitButtonText
+                )}
+              </Button>
+            )}
+          </div>
         </div>
       </form>
     </Form>

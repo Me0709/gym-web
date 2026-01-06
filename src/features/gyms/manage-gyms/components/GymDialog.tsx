@@ -7,14 +7,15 @@ import {
 } from "@/components/ui/dialog";
 import { GymForm } from "./GymForm";
 import { type GymFormValues } from "../../schemas/gyms.schemas";
-import type { Gym } from "../../types/gyms.types";
+import type { GymWithOwner } from "../../types/gyms.types";
 
 interface GymDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (data: GymFormValues) => void;
-  initialData?: Gym | null;
+  onSubmit: (data: GymFormValues) => Promise<boolean>;
+  initialData?: GymWithOwner | null;
   isLoading?: boolean;
+  apiError?: string | null;
 }
 
 export function GymDialog({
@@ -23,6 +24,7 @@ export function GymDialog({
   onSubmit,
   initialData,
   isLoading,
+  apiError,
 }: GymDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -42,6 +44,7 @@ export function GymDialog({
           initialData={initialData}
           isLoading={isLoading}
           onCancel={() => onOpenChange(false)}
+          apiError={apiError}
         />
       </DialogContent>
     </Dialog>

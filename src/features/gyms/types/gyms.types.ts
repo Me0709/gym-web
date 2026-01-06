@@ -6,6 +6,13 @@ export const GYM_STATUS = {
 
 export type GymStatus = typeof GYM_STATUS[keyof typeof GYM_STATUS];
 
+export interface Owner {
+  documentId: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+}
+
 export interface Gym {
   id: string;
   name: string;
@@ -15,5 +22,17 @@ export interface Gym {
   updatedAt: string;
 }
 
-export type CreateGymValues = Omit<Gym, 'id' | 'createdAt' | 'updatedAt' | 'status'>;
-export type UpdateGymValues = Partial<CreateGymValues> & { status?: GymStatus };
+export interface GymWithOwner extends Gym {
+  owner: Owner;
+}
+
+export type CreateGymValues = Omit<Gym, 'id' | 'createdAt' | 'updatedAt' | 'status' | 'owner'>;
+
+export type CreateGymWithOwnerValues = CreateGymValues & {
+  ownerDocumentId: string;
+  ownerFirstName: string;
+  ownerLastName: string;
+  ownerEmail: string;
+};
+
+export type UpdateGymValues = Partial<CreateGymWithOwnerValues> & { status?: GymStatus };

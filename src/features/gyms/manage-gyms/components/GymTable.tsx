@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Edit, Trash2 } from "lucide-react";
-import { type Gym, GYM_STATUS, type GymStatus } from "../../types/gyms.types";
+import { type GymWithOwner, GYM_STATUS, type GymStatus } from "../../types/gyms.types";
 
 const statusLabels: Record<GymStatus, string> = {
   [GYM_STATUS.ACTIVE]: "Activo",
@@ -23,8 +23,8 @@ const statusStyles: Record<GymStatus, string> = {
 };
 
 interface GymTableProps {
-  gyms: Gym[];
-  onEdit: (gym: Gym) => void;
+  gyms: GymWithOwner[];
+  onEdit: (gym: GymWithOwner) => void;
   onDelete: (id: string) => void;
   isLoading?: boolean;
 }

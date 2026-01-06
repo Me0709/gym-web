@@ -1,107 +1,60 @@
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { type GymFormValues } from "../../schemas/gyms.schemas";
-import { type Gym, GYM_STATUS } from "../../types/gyms.types";
+import { type GymFormValues, gymInfoSchema, ownerInfoSchema } from "../../schemas/gyms.schemas";
+import { type GymWithOwner } from "../../types/gyms.types";
 import { useGymForm } from "../hooks/useGymForm";
+import { MultiStepFormContainer } from "@/components/MultiStepFormContainer";
+import { type FormStep } from "@/hooks/useMultiStepForm";
+import { GymInfoStep } from "./form-steps/GymInfoStep";
+import { OwnerInfoStep } from "./form-steps/OwnerInfoStep";
 
 interface GymFormProps {
-  onSubmit: (data: GymFormValues) => void;
-  initialData?: Gym | null;
+  onSubmit: (data: GymFormValues) => Promise<boolean>;
+  initialData?: GymWithOwner | null;
   isLoading?: boolean;
   onCancel?: () => void;
+  apiError?: string | null;
 }
 
-export function GymForm({ onSubmit, initialData, isLoading, onCancel }: GymFormProps) {
-  const { form, handleSubmit } = useGymForm({ initialData, onSubmit });
+export function GymForm({ onSubmit, initialData, isLoading, apiError }: GymFormProps) {
+  const { form } = useGymForm({ initialData });
+
+  const steps: FormStep<GymFormValues, { isEdit: boolean }>[] = [
+    {
+      id: 1,
+      name: "Gimnasio",
+      component: GymInfoStep,
+      schema: gymInfoSchema,
+      fieldsToValidate: ["name", "address", "status"],
+    },
+    {
+      id: 2,
+      name: "Dueño",
+      component: OwnerInfoStep,
+      schema: ownerInfoSchema,
+      fieldsToValidate: ["ownerDocumentId", "ownerFirstName", "ownerLastName", "ownerEmail"],
+    },
+  ];
+
+  const handleFinalSubmit = async () => {
+    let success = false;
+    await form.handleSubmit(async (data) => {
+      success = await onSubmit(data);
+    })();
+    return success;
+  };
 
   return (
-    <Form {...form}>
-      <form onSubmit={handleSubmit} className="space-y-4 pt-4">
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Nombre del Gimnasio</FormLabel>
-              <FormControl>
-                <Input placeholder="Ej: Iron Gym" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="address"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Dirección</FormLabel>
-              <FormControl>
-                <Input placeholder="Calle 123, Ciudad" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {initialData && (
-          <FormField
-            control={form.control}
-            name="status"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Estado</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecciona un estado" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value={GYM_STATUS.ACTIVE}>Activo</SelectItem>
-                    <SelectItem value={GYM_STATUS.EXPIRED}>Expirado</SelectItem>
-                    <SelectItem value={GYM_STATUS.DELETED}>Eliminado</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        )}
-
-        <div className="flex justify-end gap-3 pt-6">
-          {onCancel && (
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onCancel}
-              disabled={isLoading}
-            >
-              Cancelar
-            </Button>
-          )}
-          <Button type="submit" disabled={isLoading}>
-            {isLoading ? "Guardando..." : initialData ? "Actualizar" : "Crear Gimnasio"}
-          </Button>
-        </div>
-      </form>
-    </Form>
+    <div className="pt-4">
+      <MultiStepFormContainer
+        form={form}
+        steps={steps}
+        onSubmit={handleFinalSubmit}
+        apiError={apiError ?? null}
+        isPending={!!isLoading}
+        stepProps={{ isEdit: !!initialData }}
+        submitButtonText={initialData ? "Actualizar" : "Crear Gimnasio"}
+        submittingButtonText="Guardando..."
+      />
+    </div>
   );
 }
 

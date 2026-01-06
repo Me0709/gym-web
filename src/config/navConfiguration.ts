@@ -45,7 +45,7 @@ export const ROLE_NAVIGATION: Partial<Record<AppRole, NavGroup[]>> = {
     },
     {
       label: "Gestión de Usuarios",
-      items: [],
+      items: ["USERS"],
     },
     {
       label: "Cuenta",
